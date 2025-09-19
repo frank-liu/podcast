@@ -42,3 +42,23 @@ What the PoC does
 Verification
 - Confirm audio file appears in STORAGE_DIR and duration <= 600s
 - Confirm metadata JSON includes messages array and audio_url
+
+Dev: serve STORAGE_DIR locally
+
+You can serve the local `STORAGE_DIR` so that files are accessible over HTTP (helpful for RSS testing and manual Spotify submission).
+
+1. Ensure `STORAGE_DIR` is set (default `./tmp/audio`).
+
+2. Start the dev static server:
+
+```bash
+scripts/dev-serve-static.sh
+```
+
+3. (Optional) Expose the local server to the internet for Spotify ingestion using `ngrok`:
+
+```bash
+# install ngrok then
+ngrok http 8080
+# take the ngrok URL and use it when hosting your RSS or audio URLs
+```
