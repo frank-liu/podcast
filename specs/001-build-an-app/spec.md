@@ -69,19 +69,19 @@ When creating this spec from a user prompt:
 ## User Scenarios & Testing *(mandatory)*
 
 ### Primary User Story
-As a publisher, I want to publish a daily audio digest that summarizes the top 10 messages for a specific topic. I need the system to produce both English and Chinese versions so listeners across languages can consume the latest news hands-free on audio platforms (e.g., Spotify). Publishers create and manage topics; each published digest must be concise (max 5 minutes) and include source attribution.
+As a publisher, I want to publish a daily audio digest that summarizes the top 10 messages for a specific topic. I need the system to produce both English and Chinese versions so listeners across languages can consume the latest news hands-free on audio platforms (e.g., Spotify). Publishers create and manage topics; each published digest must be concise (max 10 minutes) and include source attribution.
 
 ### Acceptance Scenarios
 1. Given a publisher-created topic (topic_id) and a scheduled daily publish job (or an on-demand publish action), when the job runs then the system produces a single audio file (English or Chinese) that summarizes up to 10 messages for that topic and publishes it to the centrally-managed hosting account. Pass conditions:
    - The digest metadata contains a valid audio URL and a hosting-provider success status.
-   - The generated audio duration ≤ 300 seconds (5 minutes).
+   - The generated audio duration ≤ 600 seconds (10 minutes).
 2. Given a publisher topic that has fewer than 10 messages on a given day, when the digest job runs then the system includes all available messages (<=10) and marks the digest as "partial" in metadata. Pass condition: digest.metadata.partial == true and messages.length <= 10.
 3. Given a publisher topic with no new messages that day, when the job runs then the system may either:
    - Generate a short "no new items" audio and publish it (publisher-configurable), or
    - Skip publishing and record an explicit "no-content" status in the topic digest metadata. Pass condition: digest.status in {"no-content","published"} and an admin-configured policy is applied.
 
 ### Edge Cases
-- If the aggregated messages exceed a concise spoken time budget, the summarizer must truncate or prioritize content so the final audio remains ≤ 5 minutes.
+- If the aggregated messages exceed a concise spoken time budget, the summarizer must truncate or prioritize content so the final audio remains ≤ 10 minutes.
 - If third-party APIs (news sources, translation, TTS, hosting) fail or rate-limit, the system should retry with exponential backoff, mark the digest as delayed if retries exceed thresholds, and surface an incident to the publisher dashboard.
 - If language conversion (translation) is required but fails, the system should include the original language and prepend a short note (e.g., "Source language retained due to translation error").
 
@@ -91,7 +91,7 @@ As a publisher, I want to publish a daily audio digest that summarizes the top 1
 -- **FR-001**: System MUST accept publisher actions to create/manage topics (topic_id), configure publishing schedule or on-demand publish, and set per-topic publish policies (e.g., publish_when_empty, language_variants).
 -- **FR-002**: System MUST aggregate up to 10 topical messages per publisher topic per day from configured and approved news sources.
 -- **FR-003**: System MUST normalize and summarize each message into a short 1-2 sentence snippet suitable for spoken audio and prioritize/truncate content to meet the audio time budget.
--- **FR-004**: System MUST synthesize the summarized snippets into a single coherent audio track per topic per language and ensure the resulting audio duration ≤ 300 seconds (5 minutes).
+-- **FR-004**: System MUST synthesize the summarized snippets into a single coherent audio track per topic per language and ensure the resulting audio duration ≤ 600 seconds (10 minutes).
 -- **FR-005**: System MUST publish the generated audio to the centrally-managed hosting/publishing account and record publish status and hosting metadata. Publishing may include creating or updating a topic feed entry for external distribution (RSS/Spotify).
 -- **FR-006**: System MUST record metadata for each digest (publisher_id, topic_id, message IDs, source attribution, language, generated audio length, publish status, timestamps) for auditing, analytics, and payment tracking.
 -- **FR-007**: System MUST provide retry, error handling, and alerting for third-party failures (news APIs, translation/TTS, hosting) and expose failure modes to publishers.
@@ -102,7 +102,7 @@ As a publisher, I want to publish a daily audio digest that summarizes the top 1
 
 - **Licensing & Sources (FR-009 resolved)**: Only sources with documented redistribution rights or explicit partner agreements will be ingested. Each source record MUST include provider name, license type, and an approval flag set by an admin. Public-domain and partner feeds are allowed for MVP. Summaries must include attribution; verbatim reproduction is restricted per source license.
 
-- **Audio length & quality (FR-010 resolved)**: Max 10 messages per digest. Absolute maximum audio duration: 5 minutes (300 seconds). Target typical audio length: ~3–5 minutes (depending on content density). Encoding: AAC or MP3 mono at 64–96 kbps; max file size 12 MB where possible. Use neural TTS voices with clear English and Mandarin support.
+- **Audio length & quality (FR-010 resolved)**: Max 10 messages per digest. Absolute maximum audio duration: 10 minutes (600 seconds). Target typical audio length: ~4–8 minutes (depending on content density). Encoding: AAC or MP3 mono at 64–96 kbps; max file size 12 MB where possible. Use neural TTS voices with clear English and Mandarin support.
 
 These decisions address licensing, publishing flow, and audio constraints for the MVP and remove previous ambiguities.
 
