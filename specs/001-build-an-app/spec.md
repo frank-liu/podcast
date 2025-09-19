@@ -33,6 +33,9 @@
 - ❌ Avoid HOW to implement (no tech stack, APIs, code structure)
 - 👥 Written for business stakeholders, not developers
 
+### Tone & Voice
+- Use a casual, friendly tone (like talking to a friend or family member). Keep sentences short, conversational, and approachable. Avoid overly formal or technical language in user-facing text and acceptance scenarios.
+
 ### Section Requirements
 - **Mandatory sections**: Must be completed for every feature
 - **Optional sections**: Include only when relevant to the feature
@@ -138,6 +141,7 @@ This feature must show how it meets the project Constitution gates. At minimum:
 - [ ] No implementation details (languages, frameworks, APIs) remain in spec
 - [ ] Focused on user value and business needs
 - [ ] All mandatory sections completed
+- [ ] Tone is conversational and friendly (casual/family-style)
 
 ### Requirement Completeness
 - [ ] No [NEEDS CLARIFICATION] markers remain
