@@ -28,12 +28,12 @@ T002 — Spike: Audio concat & duration enforcement (P0) — 4h
    - path: test/poc/audio.concat.test.js
    - description: "concatenates provided mock audio files and asserts final duration and file integrity"
 
-T003 — Spike: Storage adapter (local/S3) (P0) — 2h
- - Goal: Upload artifact to STORAGE_DIR or S3 and return a public URL
- - Files: src/adapters/storage/local-adapter.ts, src/adapters/storage/s3-adapter.ts
+T003 — Spike: Storage adapter (local disk STORAGE_DIR) (P0) — 2h
+ - Goal: Write artifact to configurable local `STORAGE_DIR` and return a file:// or local HTTP-accessible path for PoC
+ - Files: src/adapters/storage/local-adapter.js (simple local writer), scripts/dev-serve-static.sh (optional tiny static server for local RSS testing)
  - Failing test:
    - path: test/poc/storage.upload.test.js
-   - description: "uploads a small file to local STORAGE_DIR (mock S3) and returns accessible path"
+   - description: "writes a small file to STORAGE_DIR and returns a local path or URL (mock HTTP server for integration)"
 
 T004 — Models & DB migrations (P1) — 2d
  - Goal: Implement DB models (Publisher, Topic, Source, Message, Digest) and migrations matching data-model.md
@@ -98,19 +98,32 @@ T012 — Contract test harness (OpenAPI) (P1) — 4h
    - path: test/contract/openapi.test.js
    - description: "validates POST /publishTopics/{topicId}/digest 202 response shape"
 
-T013 — Storage/Host adapter integration (S3 or host API) (P2) — 1d
- - Goal: Implement host adapter to upload audio and return publishable URL
- - Files: src/adapters/storage/*
+T013 — Storage/Host adapter integration (local disk for MVP) (P2) — 1d
+ - Goal: Implement local storage adapter for MVP that writes audio and transcript to `STORAGE_DIR` and optionally run a tiny local static server during PoC; for production switch to an HTTPS-accessible host or podcast host.
+ - Files: src/adapters/storage/local-adapter.js, scripts/dev-serve-static.sh
  - Failing test:
-   - path: test/integration/storage.adapter.test.ts
-   - description: "uploads produced audio and asserts returned URL is reachable (mocked)"
+   - path: test/integration/storage.adapter.test.js
+   - description: "writes produced audio and transcript to STORAGE_DIR and returns a reachable local URL (mock HTTP server)"
 
-T014 — Publish pipeline: RSS generation or host API call (P2) — 1d
- - Goal: Given a published Digest produce RSS item or call host API to publish episode
- - Files: src/services/publisher.ts
+T014 — Publish pipeline: RSS generation and Spotify submission (P2) — 1d
+ - Goal: Given a published Digest produce an RSS item (episode entry) that points to the local audio file (STORAGE_DIR) and transcript; for production use a podcast host or partner API to publish to Spotify. Clarify options:
+   - Developer / MVP flow: generate RSS feed pointing to local HTTP-accessible audio URLs (run a tiny static server for `STORAGE_DIR` and expose with ngrok for Spotify to fetch during submission). Submit the RSS URL via Spotify for Podcasters (manual one-time subscribe) to have episodes appear.
+   - Production/automation options:
+     - Use a podcast hosting provider with an upload API (Libsyn, Podbean, etc.) and call their API to programmatically upload episodes and update RSS. 
+     - If you are an approved Spotify partner, you may use Spotify's Upload/Content APIs to publish programmatically (this is restricted and requires partnership/onboarding).
+ - Files: src/services/publisher.ts, scripts/dev-serve-static.sh
  - Failing test:
    - path: test/services/publisher.test.ts
-   - description: "given a digest generates RSS item or calls host adapter"
+   - description: "given a digest generates proper RSS item referencing audio URL and transcript metadata (local HTTP server mocked)"
+
+Notes: Spotify does not offer a general public episode upload API for all developers. The standard, widely-supported method is to publish via an RSS feed and submit that RSS to Spotify for Podcasters. For automation, using a hosting provider's API or becoming a Spotify partner are the common routes.
+
+T021 — Optional: Automate publishing to Spotify via hosting provider or partner API (P2) — 1d
+ - Goal: If using a host with API or if you have Spotify partner access, implement adapter to call provider/Spotify APIs to upload audio and metadata and publish episode automatically.
+ - Files: src/adapters/publish/host-adapter.js, src/adapters/publish/spotify-partner-adapter.js
+ - Failing test:
+   - path: test/integration/spotify.publish.test.js
+   - description: "adapter attempts to upload episode and returns published episode metadata (mocked provider/partner API)"
 
 T015 — Frontend: Topic management CRUD (optional P2) — 2d
  - Goal: Simple React + shadcn/ui dashboard for Topics and publish logs
