@@ -1,0 +1,55 @@
+openapi: 3.0.3
+info:
+  title: Daily Topic Audio Digest API (MVP)
+  version: 0.1.0
+servers:
+  - url: /api
+paths:
+  /publishTopics/{topicId}/digest:
+    post:
+      summary: Trigger a digest publish for a topic (on-demand)
+      parameters:
+        - name: topicId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                language:
+                  type: string
+                  enum: [en, zh]
+      responses:
+        '202':
+          description: Accepted, digest job scheduled
+        '400':
+          description: Bad request
+  /topics:
+    post:
+      summary: Create a topic (publisher-managed)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                publisherId:
+                  type: string
+                title:
+                  type: string
+                description:
+                  type: string
+      responses:
+        '201':
+          description: Topic created
+components:
+  schemas:
+    DigestStatus:
+      type: string
+      enum: [pending, generating, published, failed, no-content, partial]
