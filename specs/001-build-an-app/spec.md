@@ -100,10 +100,15 @@ for a chosen topic, in either English or Chinese, so I can consume the latest ne
   length, publish status, timestamps) for auditing and payment tracking.
 - **FR-007**: System MUST provide retry and error handling for third-party failures (news APIs, TTS, Spotify).
 
-*Ambiguities / NEEDS CLARIFICATION*
-- **FR-008**: Monetization model: publish to user's personal Spotify vs. a central monetized account? [NEEDS CLARIFICATION]
-- **FR-009**: Which news sources are eligible and any licensing requirements? [NEEDS CLARIFICATION]
-- **FR-010**: What is the expected audio length limit and acceptable quality (bitrate)? [NEEDS CLARIFICATION]
+## Resolved decisions (MVP)
+
+- **Monetization & Publishing (FR-008 resolved)**: MVP will publish digests to a centrally managed podcast host registered under the app's account. The app will publish topic-based digests (or per-user digests where consented) to the central host; Spotify distribution is via the host's RSS/podcast registration. This central model simplifies monetization (ads/subscriptions) and analytics. Personal-account publishing is a later option but NOT part of MVP.
+
+- **Licensing & Sources (FR-009 resolved)**: Only sources with documented redistribution rights or explicit partner agreements will be ingested. Each source record MUST include provider name, license type, and an approval flag set by an admin. Public-domain and partner feeds are allowed for MVP. Verbatim reproduction is limited; summaries with attribution are required.
+
+- **Audio length & quality (FR-010 resolved)**: Max 10 messages per digest. Target audio length: 4–8 minutes (typical ≈6 minutes). Encoding: AAC or MP3 mono at 64–96 kbps; max file size 12 MB. Use neural TTS voices with English and Mandarin support.
+
+These decisions address licensing, publishing flow, and audio constraints for the MVP and remove the previous NEEDS_CLARIFICATION markers.
 
 ### Key Entities *(include if feature involves data)*
 - **User**: preferences (topic, language), Spotify connection info, notification preferences
@@ -119,8 +124,11 @@ This feature must show how it meets the project Constitution gates. At minimum:
 - Code Quality: modules for aggregation, summarization, TTS, and publishing MUST be separable and reviewed.
 - Testing: unit tests for aggregation and summarization logic; integration/contract tests for news APIs, TTS,
   and Spotify publishing; end-to-end quickstart scenario to validate a full digest publish.
-- Performance: define acceptable generation latency (e.g., digest produced within 5 minutes of job start) and
-  memory/CPU budgets for TTS jobs. [NEEDS CLARIFICATION: exact targets]
+-- Performance: define acceptable generation latency and budgets. For MVP the following targets apply:
+  - End-to-end publish p95 ≤ 5 minutes from job start to published URI.
+  - Aggregation & summarization p95 ≤ 60s per user digest.
+  - TTS synthesis p95 ≤ 120s for a full digest (parallelized per-segment as needed).
+  - Publish latency p95 ≤ 60s for upload/confirmation from the hosting provider.
 - Security & Privacy: store Spotify credentials securely; honor source licensing and content retention policies.
 
 ---
