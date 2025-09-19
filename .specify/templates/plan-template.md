@@ -46,8 +46,26 @@
 
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+## Constitution Check
+*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+This section summarizes the minimum checks required by the project Constitution.
+Every plan MUST document, at minimum, how the feature satisfies the following gates:
+
+- Code Quality & Maintainability: brief note on module boundaries, public API, and
+   any anticipated technical debt and tracking ticket(s).
+- Testing Standards: list of required tests (unit, integration/contract, and quickstart
+   scenario) and explicit acceptance criteria that are testable.
+- User Experience Consistency: any API/CLI/UI contract decisions, error-code semantics,
+   and localization/accessibility considerations.
+- Performance & Resource Constraints: explicit p95/p99 targets or memory/throughput
+   budgets where applicable; indicate if performance testing will be required in CI.
+- Observability & Security: required logs/metrics/traces and high-level security
+   constraints (input validation, secrets, privacy/retention concerns).
+
+If any gate is not met, the plan MUST include a justification and an explicit mitigation
+or research task. If a gate is intentionally relaxed, note the rationale and obtain
+approver sign-off in the plan's progress tracking section.
 
 ## Project Structure
 

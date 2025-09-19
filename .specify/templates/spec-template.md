@@ -37,6 +37,19 @@
 - **Optional sections**: Include only when relevant to the feature
 - When a section doesn't apply, remove it entirely (don't leave as "N/A")
 
+Mandatory requirements for alignment with the Constitution:
+
+- Testable Acceptance Criteria: Each acceptance scenario MUST include a clear pass/fail
+   condition that can be automated in a test.
+- Performance & Resource Constraints: If the feature impacts latency, throughput, or
+   resource usage, the spec MUST state measurable targets (p95/p99, memory budgets, etc.).
+- Security & Privacy: Note any data retention, access control, or compliance requirements
+   and any review gates needed.
+
+Every spec MUST include a short "Constitution Check" section that references the
+relevant Constitution principles and explains how this feature complies or why an
+exception is required.
+
 ### For AI Generation
 When creating this spec from a user prompt:
 1. **Mark all ambiguities**: Use [NEEDS CLARIFICATION: specific question] for any assumption you'd need to make

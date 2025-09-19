@@ -21,7 +21,8 @@
 4. Apply task rules:
    → Different files = mark [P] for parallel
    → Same file = sequential (no [P])
-   → Tests before implementation (TDD)
+   → Tests before implementation (TDD). This is a hard gate: tests MUST be created and must
+     fail before implementation tasks are started for the same behavior.
 5. Number tasks sequentially (T001, T002...)
 6. Generate dependency graph
 7. Create parallel execution examples
@@ -75,6 +76,13 @@
 - [ ] T021 [P] Update docs/api.md
 - [ ] T022 Remove duplication
 - [ ] T023 Run manual-testing.md
+
+## Mandatory CI & Pipeline Tasks (insert when relevant)
+- Add or update CI job to run unit, integration, and performance/regression tests.
+- Add a constitution-check step that verifies the feature's "Constitution Check"
+   documentation is present in the plan/spec (fail pipeline if missing).
+- Add security scanning (dependency vulnerability checks) and secret-detection as part
+   of the setup or pre-merge pipeline.
 
 ## Dependencies
 - Tests (T004-T007) before implementation (T008-T014)
