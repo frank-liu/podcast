@@ -4,13 +4,13 @@
   "title": "DigestEvent",
   "type": "object",
   "properties": {
-    "digestId": {"type":"string"},
-    "topicId": {"type":"string"},
-    "publisherId": {"type":"string"},
-    "language": {"type":"string","enum":["en","zh"]},
-    "status": {"type":"string"},
-    "audioUrl": {"type":"string"},
-    "lengthSeconds": {"type":"integer"}
+    "digestId": { "type": "string" },
+    "topicId": { "type": "string" },
+    "publisherId": { "type": "string" },
+    "language": { "type": "string", "enum": ["en", "zh"] },
+    "status": { "type": "string" },
+    "audioUrl": { "type": "string" },
+    "lengthSeconds": { "type": "integer" }
   },
-  "required":["digestId","topicId","publisherId","language","status"]
+  "required": ["digestId", "topicId", "publisherId", "language", "status"]
 }

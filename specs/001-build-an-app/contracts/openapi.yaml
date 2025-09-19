@@ -25,9 +25,9 @@ paths:
                   type: string
                   enum: [en, zh]
       responses:
-        '202':
+        "202":
           description: Accepted, digest job scheduled
-        '400':
+        "400":
           description: Bad request
   /topics:
     post:
@@ -46,7 +46,7 @@ paths:
                 description:
                   type: string
       responses:
-        '201':
+        "201":
           description: Topic created
 components:
   schemas:
