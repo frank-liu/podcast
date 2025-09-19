@@ -70,42 +70,48 @@ When creating this spec from a user prompt:
 
 ### Primary User Story
 As a listener (subscriber), I want to receive a daily audio digest summarizing the top 10 messages
-for a chosen topic, in either English or Chinese, so I can consume the latest news hands-free without
-creating a full user account.
+for a publisher-curated topic feed, in either English or Chinese, so I can consume the latest news
+hands-free without creating a full user account. Topics are created and managed by publishers; subscribers
+select from available publisher topics when subscribing.
 
 ### Acceptance Scenarios
-1. Given a subscription (topic + language, optional contact) when the digest job runs for the day,
-   then the system produces a single audio file summarizing up to 10 messages and publishes it to the
-   centrally-managed hosting account; if the subscription includes contact info (email), the system
-   sends a notification with the published link.
-2. Given a subscription whose topic returns fewer than 10 messages for the day, when the digest job runs,
-   then the system includes all available messages (<=10) and marks the digest as "partial" in metadata.
+1. Given a subscription to a publisher topic (topic_id) with a selected language and optional contact, when the
+   digest job runs for the day then the system produces a single audio file summarizing up to 10 messages for
+   that publisher topic and publishes it to the centrally-managed hosting account; if the subscription includes
+   contact info (email), the system sends a notification with the published link.  
+   Pass condition: an audio file URL is present in the digest metadata and the hosting provider reports success.
+2. Given a subscription whose publisher topic returns fewer than 10 messages for the day, when the digest job runs,
+   then the system includes all available messages (<=10) and marks the digest as "partial" in metadata.  
+   Pass condition: digest.metadata.partial == true and messages.length <= 10.
 
 ### Edge Cases
 - Topic has no matching news that day → generate an audio stating "no new items" and skip publish to the
-  public feed (optionally send a notification to contact if present).
+  public feed (optionally send a notification to contact if present). Publishers may disable publishing for a topic
+  if no new content is acceptable.
 - Third-party API rate-limits or failures → queue retry with exponential backoff and mark the digest as
   delayed; notify user if publish fails after retries.
-- Language conversion unavailable for a message (e.g., source only Chinese but user selected English) →
+- Language conversion unavailable for a message (e.g., source only Chinese but subscriber selected English) →
   attempt translation; if translation fails, include original language with a short note.
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
--- **FR-001**: System MUST accept a subscription (topic, language, optional contact details) and schedule a daily digest.
--- **FR-002**: System MUST aggregate up to 10 topical messages per subscription per day from configured news sources.
-- **FR-003**: System MUST normalize each message into a short, 1-2 sentence summary suitable for audio.
-- **FR-004**: System MUST synthesize the 10 summaries into one coherent audio file (single track) per user per day,
-  allowing both English and Chinese outputs.
+-- **FR-001**: System MUST accept a subscription referencing a publisher topic (topic_id), a language (English/Chinese),
+  and optional contact details, and schedule a daily digest.
+-- **FR-002**: System MUST aggregate up to 10 topical messages per publisher topic per day from configured news sources
+  and prepare per-subscription localized digests when subscribers request different languages.
+-- **FR-003**: System MUST normalize each message into a short, 1-2 sentence summary suitable for audio.
+-- **FR-004**: System MUST synthesize the summaries into one coherent audio file (single track) per subscription per day,
+  supporting both English and Chinese outputs.
 -- **FR-005**: System MUST publish the generated audio to the centrally-managed hosting/publishing account and
   provide a link back to the subscription contact (if provided) or make it available on the public/topic feed.
--- **FR-006**: System MUST record metadata for each digest (subscription_id, message IDs, source attribution,
+-- **FR-006**: System MUST record metadata for each digest (subscription_id, topic_id, message IDs, source attribution,
   language, generated audio length, publish status, timestamps) for auditing and payment tracking.
 -- **FR-007**: System MUST provide retry and error handling for third-party failures (news APIs, TTS, hosting).
 
 ## Resolved decisions (MVP)
 
--- **Monetization & Publishing (FR-008 resolved)**: MVP will publish digests to a centrally managed podcast host registered under the app's account. The app will publish topic-based digests (or per-subscription digests where consented) to the central host; Spotify distribution is via the host's RSS/podcast registration. This central model simplifies monetization (ads/subscriptions) and analytics. Personal-account publishing is a later option but NOT part of MVP.
+-- **Monetization & Publishing (FR-008 resolved)**: MVP will publish digests to a centrally managed podcast host registered under the app's account. The app will publish publisher-created topic feeds (or per-subscription variants when language differs) to the central host; Spotify distribution is via the host's RSS/podcast registration. This central model simplifies monetization (ads/subscriptions) and analytics. Personal-account publishing is a later option but NOT part of MVP.
 
 - **Licensing & Sources (FR-009 resolved)**: Only sources with documented redistribution rights or explicit partner agreements will be ingested. Each source record MUST include provider name, license type, and an approval flag set by an admin. Public-domain and partner feeds are allowed for MVP. Verbatim reproduction is limited; summaries with attribution are required.
 
@@ -114,9 +120,11 @@ creating a full user account.
 These decisions address licensing, publishing flow, and audio constraints for the MVP and remove the previous NEEDS_CLARIFICATION markers.
 
 ### Key Entities *(include if feature involves data)*
-- **Subscription**: id, topic, language, optional contact_info (email), preferences (frequency)
+- **Publisher**: id, name, contact_info, approved_topics[]
+- **Topic**: id, publisher_id, title, description, feed_config, publish_enabled (boolean)
+- **Subscription**: id, topic_id, language, optional contact_info (email), preferences (frequency)
 - **Message**: source_id, title, summary_text, language, timestamp, metadata
-- **Digest**: subscription_id, date, messages[<=10], audio_url, language, status, length_seconds, publish_attempts
+- **Digest**: subscription_id, topic_id, date, messages[<=10], audio_url, language, status, length_seconds, publish_attempts
 - **Source**: provider_name, api_config, rate_limit_info, licensing_terms
 
 ---
@@ -163,5 +171,3 @@ This feature must show how it meets the project Constitution gates. At minimum:
 - [ ] Review checklist passed
 
 ---
-
-```
